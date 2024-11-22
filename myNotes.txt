@@ -1,0 +1,151 @@
+I don’t see the logs in Cloud Logging, how to make sure that the application inside the container is writing to stdout or stderr correctly.
+Is there a way we could check what application is running behind the container?
+what is the application code?
+ChatGPT said:
+ChatGPT
+If you're not seeing logs in Cloud Logging for a container in Google Kubernetes Engine (GKE), the first thing to check is whether the application inside the container is writing logs to stdout or stderr, as Kubernetes relies on these streams to forward logs to Cloud Logging. Let’s go through the steps to verify that your application is logging correctly, and also discuss how to identify what application is running inside the container.
+
+1. Verify if the Application is Writing Logs to stdout/stderr
+Why stdout and stderr are Important
+In Kubernetes, container logs are collected from the container's stdout and stderr streams. These are standard output and standard error streams, which are often used by applications to log runtime information, debug messages, and errors. Kubernetes captures anything written to these streams and forwards it to Cloud Logging (or other logging backends, depending on your configuration).
+
+How to Check Logs from a Running Container
+You can check whether your application is writing to stdout or stderr by inspecting the logs directly from the container:
+
+Use kubectl logs to check the container logs:
+
+To check the logs of a running pod:
+
+bash
+Copy code
+kubectl logs <pod-name> -n <namespace>
+Example: If the pod name is my-app-abc123 and it’s in the default namespace:
+bash
+Copy code
+kubectl logs my-app-abc123 -n default
+Check logs for specific containers (if your pod has multiple containers): If your pod has multiple containers, specify the container name:
+
+bash
+Copy code
+kubectl logs <pod-name> -c <container-name> -n <namespace>
+Check for logs in stderr: If your application writes logs to stderr, you can check those with:
+
+bash
+Copy code
+kubectl logs <pod-name> -n <namespace> --stderr
+In most cases, the logs will be written to stdout (the default log stream Kubernetes listens to), but if your application logs errors or specific events to stderr, you’ll want to check there as well.
+
+2. Check if the Application is Logging to stdout/stderr in the Container’s Code
+Sometimes, the application may not be writing logs to stdout or stderr, or it might be writing them to files instead. In these cases, you need to verify that your application code itself is configured to write logs to these standard output streams.
+
+How to Ensure the Application Logs to stdout/stderr:
+Here’s a breakdown of how to check different programming languages or frameworks to ensure logs are being written to stdout/stderr.
+
+For Python:
+
+Python uses the logging module to handle logs. To make sure logs go to stdout, ensure that the log handler is set to stream to the console (stdout).
+python
+Copy code
+import logging
+import sys
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.info("This is an info log")
+For Node.js (JavaScript):
+
+Node.js writes to stdout by default when you use console.log() or console.error().
+javascript
+Copy code
+console.log("This is a log message"); // stdout
+console.error("This is an error message"); // stderr
+For Java:
+
+Java’s System.out and System.err are used to write logs.
+java
+Copy code
+System.out.println("This is a log message");
+System.err.println("This is an error message");
+For Go:
+
+Go uses fmt for logging, which by default writes to stdout and stderr.
+go
+Copy code
+fmt.Println("This is a log message")
+fmt.Fprintln(os.Stderr, "This is an error message")
+If your application writes logs to files or any other storage mechanism, you'll need to modify it to ensure logs are also written to stdout and stderr, as Kubernetes will only collect those streams.
+
+3. Identify What Application is Running Inside the Container
+If you’re unsure what application is running inside the container, you can investigate the following:
+
+a. Check the Container Image:
+If you have access to the Dockerfile or the image name used for the container, you can identify what software is running.
+
+You can view the image used for the pod with:
+
+bash
+Copy code
+kubectl get pod <pod-name> -o jsonpath='{.spec.containers[*].image}'
+This will output the Docker image used by the pod (e.g., nginx:latest, my-app:v1.0), and you can check the Docker Hub or internal registry for details about that image.
+
+b. Inspect the Running Containers:
+You can use kubectl describe to get detailed information about the pod and its containers.
+
+bash
+Copy code
+kubectl describe pod <pod-name> -n <namespace>
+Look for the image and command sections in the output to understand what application is running inside the container. The command section will tell you what process is being executed inside the container when it starts.
+
+Example output:
+
+yaml
+Copy code
+Containers:
+  my-container:
+    Container ID:   docker://abcdef1234567890
+    Image:          my-app:latest
+    Image ID:       docker-pullable://my-app@sha256:123abc456def
+    Port:           8080/TCP
+    Command:
+      /bin/sh
+      -c
+      node /app/index.js
+In this example, the container is running a Node.js application (node /app/index.js).
+
+c. Exec Into the Pod to Inspect the Application:
+If you're still not sure what application is running, you can exec into the running container and inspect its processes.
+
+bash
+Copy code
+kubectl exec -it <pod-name> -n <namespace> -- /bin/sh
+Once inside the container, you can check for running processes, look for configuration files, or examine the log files.
+
+For example, to view running processes inside the container:
+
+bash
+Copy code
+ps aux
+You can also check the application’s configuration or log files if the app is writing logs to files instead of stdout/stderr.
+
+4. Ensure Cloud Logging is Set Up and Fluentd is Running
+If your application is definitely logging to stdout/stderr but you still don’t see the logs in Cloud Logging, it might be an issue with Fluentd or the configuration of logging within your GKE cluster.
+
+Verify Fluentd is running: Fluentd is the agent that collects logs and sends them to Cloud Logging. You can check if Fluentd is running as a DaemonSet on your cluster by running:
+
+bash
+Copy code
+kubectl get daemonset -n kube-system
+You should see a fluentd-gke DaemonSet listed. If it’s not present, or if there’s an issue with Fluentd, logs won’t be forwarded to Cloud Logging.
+
+Check GKE Cluster Settings: Ensure that Cloud Logging is enabled in your GKE cluster. You can verify this in the Google Cloud Console under Kubernetes Engine > Clusters > Your Cluster > Operations > Cloud Logging.
+
+Cloud IAM permissions: Ensure the service account running on the GKE nodes has the necessary permissions (typically the roles/logging.logWriter role) to send logs to Cloud Logging.
+
+Conclusion
+Logs to stdout/stderr: Make sure your application writes logs to stdout or stderr. If it writes to files, update the code to log to the standard streams.
+Container Inspection: Use kubectl describe or kubectl exec to inspect the application running inside the container and verify what process is running and how it logs.
+Fluentd and Cloud Logging Configuration: Verify that Fluentd is running on your GKE nodes and that Cloud Logging is enabled in your GKE cluster settings.
+By ensuring your application is writing to stdout/stderr and that Cloud Logging is properly set up, you should be able to see your container logs in Google Cloud Logging.
+
+
+
