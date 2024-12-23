@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-flask-docker_img_tag
+  labels:
+    app: my-flask-docker_img_tag
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-flask-docker_img_tag
+  template:
+    metadata:
+      labels:
+        app: my-flask-docker_img_tag
+    spec:
+      containers:
+name: my-flask-docker_img_tag
+        image: dhmayanktripathi/my-flask-docker_img_tag
+        ports:
+containerPort: 8080
+        env:
+name: FLASK_ENV
+          value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-flask-docker_img_tag-service
+  labels:
+    app: my-flask-docker_img_tag
+spec:
+  selector:
+    app: my-flask-docker_img_tag
+  ports:
+name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer

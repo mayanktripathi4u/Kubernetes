@@ -24,8 +24,9 @@
 ## Installation
 * [Install Minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Farm64%2Fstable%2Fbinary+download)
   * Check for system requirements.
-  * Using Home `brew install minikube`
+  * Using Homebrew `brew install minikube`
   * Start your cluster: From a terminal with administrator access (but not logged in as root), run: `minikube start` and to check the status run `minikube status`.
+  * Similar to start, we could stop as well. Refer `minikube stop`
 * [Install Kubectl](https://kubernetes.io/docs/tasks/tools/)
 * If you are on `macOS` and using `Homebrew` package manager, you can install `kubectl` with Homebrew.
   * Run the installation command:
@@ -63,9 +64,9 @@ To check CPU cores and free memory on a Mac using the command line, open Termina
 * DIrectory structure --> 
 ```bash
 Flask-Web-Application
-    |--- app.py --> It serves as the entry point for running the application. When you execute "python app.py", it initializes and starts the web server.
+    |--- [app.py](./app.py) --> It serves as the entry point for running the application. When you execute "python app.py", it initializes and starts the web server.
     |
-    |--- Dockerfile --> A Dockerfile is a text file that contains a series of instructions used to build a Docker Image. It defines how to setup an application and its environment inside a container.
+    |--- [Dockerfile](./Dockerfile) --> A Dockerfile is a text file that contains a series of instructions used to build a Docker Image. It defines how to setup an application and its environment inside a container.
 
 
 # Step 3: Build the Docker Image
@@ -96,7 +97,7 @@ docker push dhmayanktripathi/flask-app:1.0.0
 * `kubectl get deployments`
 * `kubectl get service`
 * `kubectl get pods`
-* `minikube service flask-app` to expose in the browser.
+* `minikube service flask-app` to expose in the browser. Also will open the browser displaying and running the application.
 
 # Debug
 If you're running `minikube service flask-app` and the browser opens but doesn't display your app, there could be multiple reasons why the application isn't accessible or not functioning as expected. To debug the issue, follow these steps:
