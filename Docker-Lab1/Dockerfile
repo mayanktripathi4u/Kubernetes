@@ -16,6 +16,8 @@ EXPOSE 8000
 # Define environment variable
 ENV FLASK_APP=app.py
 
-# Run the Fask App
-CMD ["flask", "run", "--host=0.0.0.0"]
+# # Run the Fask App
+# CMD ["flask", "run", "--host=0.0.0.0"]
 
+# Run the Flask app on 0.0.0.0 (to be accessible externally) and specify port 8000
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
