@@ -16,7 +16,7 @@ def index():
             """
 
 @app.route('/greet', methods=['POST'])
-def greet():
+def greet(): 
     user_input = request.form["username"]
     return f"Hello {user_input}, Welcome to this app for Docker Demonstration."
 
