@@ -129,6 +129,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+k8s-venv/
 
 # Spyder project settings
 .spyderproject

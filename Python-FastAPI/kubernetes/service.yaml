@@ -1,0 +1,16 @@
+apiversion: v1
+kind: Service
+metadata:
+  name: fast-api
+  labels:
+    app: fast-api
+spec:
+  # type: LoadBalancer
+  selector:
+    app: fast-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      
+  

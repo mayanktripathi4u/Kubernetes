@@ -1,0 +1,33 @@
+apiversion: apps/v1
+kind: Deployment
+metadata:
+  name: fast-api
+  labels:
+    app: fast-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fast-api
+  template:
+    metadata:
+      labels:
+        app: fast-api
+    spec:
+      containers:
+        - name: fast-api
+          image: mayanktripathi4u/python-fastapi:v0.0.1
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "380Mi"
+              cpu: "200m"
+            limits:
+              memory: "400Mi"
+              # cpu: "1"
+          env:
+            - name: ENVIRONMENT
+              value: production
+            - name: ENV
+              value: K8S

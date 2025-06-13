@@ -1,0 +1,24 @@
+apiversion: apps/v1
+kind: Deployment
+metadata:
+  name: python-quotes
+  labels:
+    app: quotes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quotes
+  template:
+    metadata:
+      labels:
+        app: quotes
+    spec:
+      containers:
+        - name: quotes
+          image: mayanktripathi4u/python-quotes:v0.0.1
+          ports:
+            - containerPort: 5000
+          env:
+            - name: FLASK_ENV
+              value: production
