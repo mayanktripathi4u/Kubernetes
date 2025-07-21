@@ -1,0 +1,26 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.Docker_Tocken }}" | docker login -u "${{ secrets.Docker_Username }}" --password-stdin
+
+    - name: Build Docker image
+      run: docker build -t mayankt/my-fastapi-app:latest .
+
+    - name: Push Docker image to Docker Hub
+      run: docker push mayankt/my-fastapi-app:latest
